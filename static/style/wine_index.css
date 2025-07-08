@@ -1,0 +1,126 @@
+/* Estilos para la página principal del clasificador de vinos */
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.wine-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  margin: 2rem auto;
+  max-width: 1000px;
+}
+
+.wine-header {
+  background: linear-gradient(45deg, #722f37, #b03a2e);
+  color: white;
+  padding: 2rem;
+  border-radius: 20px 20px 0 0;
+  text-align: center;
+}
+
+.wine-form {
+  padding: 2rem;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #722f37;
+  box-shadow: 0 0 0 0.2rem rgba(114, 47, 55, 0.25);
+}
+
+.btn-wine {
+  background: linear-gradient(45deg, #722f37, #b03a2e);
+  border: none;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  color: white;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-wine:hover {
+  background: linear-gradient(45deg, #b03a2e, #722f37);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(114, 47, 55, 0.3);
+  color: white;
+}
+
+.result-card {
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-left: 5px solid #722f37;
+}
+
+.wine-icon {
+  font-size: 3rem;
+  color: #722f37;
+  margin-bottom: 1rem;
+}
+
+.input-group-text {
+  background: #722f37;
+  color: white;
+  border: none;
+  border-radius: 10px 0 0 10px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.info-tooltip {
+  cursor: help;
+  color: #6c757d;
+}
+
+.parameter-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #722f37;
+}
+
+/* Estilos para iconos específicos */
+.large-icon {
+  font-size: 2rem;
+}
+
+.extra-large-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para botones adicionales */
+.btn-outline-info {
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid #17a2b8;
+  color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+}

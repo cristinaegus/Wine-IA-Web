@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🍷 Acerca del Clasificador de Vinos</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='style/wine_about.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="wine-container">
+        <div class="wine-header">
+          <i class="fas fa-wine-glass header-icon"></i>
+          <h1>Acerca del Clasificador de Vinos</h1>
+          <p class="mb-0">
+            Sistema de Machine Learning para Predicción de Calidad
+          </p>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="feature-card">
+              <h4><i class="fas fa-database text-primary"></i> Dataset</h4>
+              <p>
+                El modelo está entrenado con el dataset
+                <strong>"Wine Quality"</strong> que contiene:
+              </p>
+              <ul>
+                <li>
+                  <strong>1,599 muestras</strong> de vino tinto portugués "Vinho
+                  Verde"
+                </li>
+                <li>
+                  <strong>11 características fisicoquímicas</strong> como
+                  predictores
+                </li>
+                <li>
+                  <strong>Calidades de 3 a 8</strong> en escala de 10 puntos
+                </li>
+                <li>Dataset balanceado usando técnicas de SMOTEENN</li>
+              </ul>
+            </div>
+
+            <div class="feature-card">
+              <h4>
+                <i class="fas fa-brain text-success"></i> Modelo de Machine
+                Learning
+              </h4>
+              <p>
+                Utilizamos
+                <strong>XGBoost (Extreme Gradient Boosting)</strong> por su
+                excelente rendimiento:
+              </p>
+              <ul>
+                <li>
+                  <strong>Accuracy: 97.5%</strong> en el conjunto de prueba
+                </li>
+                <li>
+                  Modelo ensemble que combina múltiples árboles de decisión
+                </li>
+                <li>Optimizado para problemas de clasificación multiclase</li>
+                <li>Robusto ante overfitting con regularización L1 y L2</li>
+              </ul>
+            </div>
+
+            <div class="feature-card">
+              <h4>
+                <i class="fas fa-flask text-warning"></i> Características
+                Analizadas
+              </h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Acidez y pH:</h6>
+                  <ul>
+                    <li>Acidez fija (ácidos tartáricos)</li>
+                    <li>Acidez volátil (ácido acético)</li>
+                    <li>Ácido cítrico</li>
+                    <li>pH del vino</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <h6>Composición Química:</h6>
+                  <ul>
+                    <li>Azúcar residual</li>
+                    <li>Cloruros (sal)</li>
+                    <li>Sulfatos (antioxidantes)</li>
+                    <li>Dióxido de azufre (conservante)</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <h6>Propiedades Físicas:</h6>
+                  <ul>
+                    <li>Densidad</li>
+                    <li>Contenido alcohólico</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <h4>
+                <i class="fas fa-cogs text-info"></i> Tecnologías Utilizadas
+              </h4>
+              <p>Aplicación web desarrollada con tecnologías modernas:</p>
+              <div class="mb-3">
+                <span class="tech-badge"
+                  ><i class="fab fa-python"></i> Python 3.12</span
+                >
+                <span class="tech-badge"
+                  ><i class="fas fa-server"></i> Flask</span
+                >
+                <span class="tech-badge"
+                  ><i class="fas fa-chart-line"></i> XGBoost</span
+                >
+                <span class="tech-badge"
+                  ><i class="fas fa-table"></i> Pandas</span
+                >
+                <span class="tech-badge"
+                  ><i class="fas fa-calculator"></i> NumPy</span
+                >
+                <span class="tech-badge"
+                  ><i class="fas fa-robot"></i> Scikit-learn</span
+                >
+                <span class="tech-badge"
+                  ><i class="fab fa-bootstrap"></i> Bootstrap 5</span
+                >
+                <span class="tech-badge"
+                  ><i class="fab fa-html5"></i> HTML5</span
+                >
+                <span class="tech-badge"
+                  ><i class="fab fa-css3-alt"></i> CSS3</span
+                >
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <h4>
+                <i class="fas fa-chart-bar text-danger"></i> Rendimiento del
+                Modelo
+              </h4>
+              <div class="row">
+                <div class="col-md-4 text-center">
+                  <h5 class="text-primary">97.5%</h5>
+                  <small>Accuracy General</small>
+                </div>
+                <div class="col-md-4 text-center">
+                  <h5 class="text-success">95%+</h5>
+                  <small>F1-Score Promedio</small>
+                </div>
+                <div class="col-md-4 text-center">
+                  <h5 class="text-warning">6 Clases</h5>
+                  <small>Predicción Multiclase</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <h4><i class="fas fa-lightbulb text-secondary"></i> Cómo Usar</h4>
+              <ol>
+                <li>
+                  <strong>Ingrese los valores</strong> de las 11 características
+                  del vino
+                </li>
+                <li>
+                  <strong>Use el botón "Cargar Ejemplo"</strong> para valores de
+                  referencia
+                </li>
+                <li>
+                  <strong>Haga clic en "Predecir Calidad"</strong> para obtener
+                  el resultado
+                </li>
+                <li>
+                  <strong>Interprete el resultado:</strong>
+                  <ul>
+                    <li>🔴 Calidad 3-4: Baja</li>
+                    <li>🟡 Calidad 5-6: Media</li>
+                    <li>🟢 Calidad 7-8: Alta</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+
+            <div class="feature-card">
+              <h4>
+                <i class="fas fa-exclamation-triangle text-warning"></i>
+                Limitaciones
+              </h4>
+              <ul>
+                <li>
+                  Modelo específico para
+                  <strong>vinos tintos</strong> portugueses
+                </li>
+                <li>
+                  Calidad basada en <strong>análisis sensorial</strong> de
+                  expertos
+                </li>
+                <li>
+                  Los rangos de valores deben estar dentro de los
+                  <strong>límites del dataset</strong>
+                </li>
+                <li>Predicción probabilística, no determinística</li>
+              </ul>
+            </div>
+
+            <div class="text-center mt-4">
+              <a href="/" class="btn btn-wine btn-lg">
+                <i class="fas fa-arrow-left"></i> Volver al Clasificador
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-4">
+      <div class="container">
+        <p class="text-white-50 mb-0">
+          <i class="fas fa-copyright"></i> cegusquiza 2025
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
