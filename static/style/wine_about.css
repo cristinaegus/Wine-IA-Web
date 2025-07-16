@@ -29,6 +29,7 @@ body {
   padding: 1.5rem;
   margin-bottom: 1rem;
   border-left: 4px solid #722f37;
+  color: #1a1a1a;
 }
 
 .tech-badge {
@@ -60,5 +61,63 @@ body {
 /* Estilos para iconos específicos */
 .header-icon {
   font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para las tarjetas de información */
+.info-card {
+  background: rgba(114, 47, 55, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #722f37;
+  color: white;
+}
+
+.tech-card {
+  background: rgba(23, 162, 184, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #17a2b8;
+  color: white;
+}
+
+.data-card {
+  background: rgba(40, 167, 69, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #28a745;
+  color: white;
+}
+
+.process-card {
+  background: rgba(114, 47, 55, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  border: 2px solid #722f37;
+  color: white;
+}
+
+.algorithm-card {
+  background: rgba(255, 193, 7, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #ffc107;
+  color: white;
+}
+
+.info-section {
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.process-icon {
+  font-size: 2.5rem;
+  color: #722f37;
   margin-bottom: 1rem;
 }
