@@ -1,6 +1,7 @@
 /* Estilos para la página principal del clasificador de vinos */
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6)),
+    url("../images/womanDrinkingWine.jpg") center/cover no-repeat fixed;
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -40,22 +41,41 @@ body {
 }
 
 .btn-wine {
-  background: linear-gradient(45deg, #722f37, #b03a2e);
-  border: none;
-  border-radius: 10px;
-  padding: 1rem 2rem;
-  color: white;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  background: linear-gradient(45deg, #722f37, #b03a2e) !important;
+  border: 2px solid #722f37 !important;
+  border-radius: 10px !important;
+  padding: 1rem 2rem !important;
+  color: white !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  text-decoration: none !important;
+  display: inline-block !important;
 }
 
 .btn-wine:hover {
-  background: linear-gradient(45deg, #b03a2e, #722f37);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(114, 47, 55, 0.3);
-  color: white;
+  background: linear-gradient(45deg, #b03a2e, #722f37) !important;
+  border-color: #b03a2e !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(114, 47, 55, 0.3) !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.btn-wine:focus,
+.btn-wine:active {
+  background: linear-gradient(45deg, #722f37, #b03a2e) !important;
+  border-color: #722f37 !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.2rem rgba(114, 47, 55, 0.25) !important;
+}
+
+.btn-wine:disabled {
+  background: linear-gradient(45deg, #6c757d, #adb5bd) !important;
+  border-color: #6c757d !important;
+  color: white !important;
+  opacity: 0.65 !important;
 }
 
 .result-card {

@@ -1,6 +1,7 @@
 /* Estilos para la página de información del clasificador de vinos */
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: url("../images/pexels-david-paisajevinos.jpg") center/cover
+    no-repeat fixed;
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }

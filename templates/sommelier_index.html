@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
     <link
-      href="{{ url_for('static', filename='style/sommelier.css') }}?v=2"
+      href="{{ url_for('static', filename='style/sommelier.css') }}?v=4"
       rel="stylesheet"
     />
     <style>
@@ -93,6 +93,31 @@
 
           <form method="POST" id="sommelierForm">
             <div class="row">
+              <!-- Tipo de Vino -->
+              <div class="col-md-12 mb-4">
+                <div class="parameter-card">
+                  <label for="tipo_vino" class="form-label">
+                    <i class="fas fa-wine-glass"></i> Tipo de Vino
+                  </label>
+                  <select
+                    class="form-select"
+                    id="tipo_vino"
+                    name="tipo_vino"
+                    required
+                  >
+                    <option value="">Selecciona el tipo de vino</option>
+                    <option value="Tinto">🔴 Tinto</option>
+                    <option value="Blanco">⚪ Blanco</option>
+                    <option value="Todos">🍷 Todos los tipos</option>
+                  </select>
+                  <small class="form-text text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    Elige entre vinos tintos o blancos, o selecciona "Todos"
+                    para ver ambos tipos
+                  </small>
+                </div>
+              </div>
+
               <!-- Presupuesto -->
               <div class="col-md-6 mb-3">
                 <div class="parameter-card">
@@ -255,22 +280,28 @@
                   <div class="mb-2">
                     <h6 class="text-warning mb-1 wine-name">
                       <i class="fas fa-wine-glass"></i>
-                      {% if vino.nombre_completo %} {{
-                      vino.nombre_completo[:120] }}{% if
-                      vino.nombre_completo|length > 120 %}...{% endif %} {% elif
-                      vino.nombre_vino %} {% set wine_name =
-                      vino.nombre_vino.split(',')[0] if ',' in vino.nombre_vino
-                      else vino.nombre_vino %} {% set clean_name =
-                      wine_name.split('4,')[0] if '4,' in wine_name else
-                      wine_name %} {{ clean_name[:120] }}{% if clean_name|length
-                      > 120 %}...{% endif %} {% else %} Vino de {{ vino.bodega
-                      }} {% endif %}
+                      {% if vino.nombre_limpio %} {% set nombre_final =
+                      vino.nombre_limpio.split('(')[0].split(',')[0].split('-')[0].strip()
+                      %} {{ nombre_final }} {% elif vino.nombre_completo %} {%
+                      set nombre_final =
+                      vino.nombre_completo.split('(')[0].split(',')[0].split('-')[0].strip()
+                      %} {{ nombre_final[:50] }}{% if nombre_final|length > 50
+                      %}...{% endif %} {% elif vino.nombre_vino %} {% set
+                      nombre_final =
+                      vino.nombre_vino.split('(')[0].split(',')[0].split('-')[0].strip()
+                      %} {{ nombre_final[:50] }}{% if nombre_final|length > 50
+                      %}...{% endif %} {% else %} Vino de {{ vino.bodega }} {%
+                      endif %} {% if vino.año and vino.año != "N/A" %} ({{
+                      vino.año }}){% endif %}
                     </h6>
                     <div
                       class="d-flex justify-content-between align-items-center"
                     >
                       <small class="text-light">
-                        <i class="fas fa-industry"></i> {{ vino.bodega }}
+                        <i class="fas fa-industry"></i>
+                        {% set bodega_limpia =
+                        vino.bodega.split(',')[0].split('(')[0].split('-')[0].strip()
+                        if vino.bodega else 'Bodega' %} {{ bodega_limpia }}
                       </small>
                       <span class="price-range"
                         >{{ "%.2f"|format(vino.precio_eur) }}€</span

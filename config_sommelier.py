@@ -31,10 +31,32 @@ class Config:
     # Archivos de datos
     CSV_PATTERN_1 = 'vivino_scraping_completo_*.csv'
     CSV_PATTERN_2 = 'resumen_scraping_completo_*.csv'
+    CSV_PATTERN_LIMPIO = 'resumen_scraping_completo_*_limpio_*.csv'  # Archivos limpios prioritarios
+    CSV_PATTERN_ULTRA_LIMPIO = 'resumen_scraping_completo_*_ultra_limpio.csv'  # Archivos ultra limpios
+    CSV_PATTERN_COMBINADO = 'dataset_vinos_combinado_ultra_limpio_*.csv'  # Dataset balanceado tintos+blancos
+    
     CSV_FILES_1 = list(DATA_DIR.glob(CSV_PATTERN_1)) if DATA_DIR.exists() else []
     CSV_FILES_2 = list(DATA_DIR.glob(CSV_PATTERN_2)) if DATA_DIR.exists() else []
-    CSV_FILES = CSV_FILES_1 + CSV_FILES_2  # Combinar ambos tipos de archivos
-    LATEST_CSV = max(CSV_FILES, key=os.path.getctime) if CSV_FILES else None
+    CSV_FILES_LIMPIO = list(DATA_DIR.glob(CSV_PATTERN_LIMPIO)) if DATA_DIR.exists() else []
+    CSV_FILES_ULTRA_LIMPIO = list(DATA_DIR.glob(CSV_PATTERN_ULTRA_LIMPIO)) if DATA_DIR.exists() else []
+    CSV_FILES_COMBINADO = list(DATA_DIR.glob(CSV_PATTERN_COMBINADO)) if DATA_DIR.exists() else []
+    
+    # Priorizar dataset combinado > archivos ultra limpios > limpios > originales
+    if CSV_FILES_COMBINADO:
+        LATEST_CSV = max(CSV_FILES_COMBINADO, key=os.path.getctime)
+        print(f"⚖️ Usando dataset BALANCEADO (tintos + blancos): {LATEST_CSV.name}")
+    elif CSV_FILES_ULTRA_LIMPIO:
+        LATEST_CSV = max(CSV_FILES_ULTRA_LIMPIO, key=os.path.getctime)
+        print(f"🌟 Usando archivo de datos ULTRA LIMPIO: {LATEST_CSV.name}")
+    elif CSV_FILES_LIMPIO:
+        LATEST_CSV = max(CSV_FILES_LIMPIO, key=os.path.getctime)
+        print(f"✨ Usando archivo de datos LIMPIO: {LATEST_CSV.name}")
+    else:
+        CSV_FILES = CSV_FILES_1 + CSV_FILES_2  # Combinar ambos tipos de archivos
+        LATEST_CSV = max(CSV_FILES, key=os.path.getctime) if CSV_FILES else None
+        if LATEST_CSV:
+            print(f"📊 Usando archivo de datos original: {LATEST_CSV.name}")
+    
     
     # Archivos del modelo actualizado (buscar en static primero, luego directorios alternativos)
     MODEL_FILE = STATIC_DIR / 'wine_model.pkl' if (STATIC_DIR / 'wine_model.pkl').exists() else (BASE_DIR / 'modelo_random_forest_vivino.pkl' if (BASE_DIR / 'modelo_random_forest_vivino.pkl').exists() else MODELS_DIR / 'modelo_random_forest_vivino.pkl')

@@ -291,17 +291,37 @@ def predecir_calidad_vino_simple(precio, rating, año, bodega="Desconocida", reg
         print(f"❌ Error en predicción simple: {e}")
         return "Error en predicción", 0
 
-def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0):
-    """Busca vinos similares en el dataset"""
+def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0, tipo_vino=None):
+    """Busca vinos similares en el dataset con deduplicación mejorada"""
     if df_vinos.empty:
         return []
     
-    # Filtrar vinos por criterios
-    vinos_filtrados = df_vinos[
-        (df_vinos['precio_eur'] >= precio_min) &
-        (df_vinos['precio_eur'] <= precio_max) &
-        (df_vinos['rating'] >= rating_min)
+    print(f"🔍 Iniciando búsqueda: €{precio_min}-{precio_max}, rating ≥{rating_min}")
+    if tipo_vino and tipo_vino != "Todos":
+        print(f"🍷 Filtro por tipo: {tipo_vino}")
+    
+    # IMPORTANTE: Hacer una copia fresca del DataFrame para evitar modificaciones acumulativas
+    df_original = df_vinos.copy()
+    
+    # Filtrar vinos por criterios básicos
+    vinos_filtrados = df_original[
+        (df_original['precio_eur'] >= precio_min) &
+        (df_original['precio_eur'] <= precio_max) &
+        (df_original['rating'] >= rating_min)
     ].copy()
+    
+    # Filtrar por tipo de vino si se especifica
+    if tipo_vino and tipo_vino != "Todos":
+        vinos_filtrados = vinos_filtrados[
+            vinos_filtrados['tipo_vino'] == tipo_vino
+        ].copy()
+        print(f"🎯 Vinos {tipo_vino.lower()}s encontrados: {len(vinos_filtrados)}")
+    
+    print(f"📊 Vinos encontrados inicialmente: {len(vinos_filtrados)}")
+    
+    if len(vinos_filtrados) == 0:
+        print("❌ No se encontraron vinos con los criterios especificados")
+        return []
     
     # Limpiar y convertir rating
     def limpiar_rating(rating_str):
@@ -319,10 +339,232 @@ def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0):
     vinos_filtrados['rating_limpio'] = vinos_filtrados['rating'].apply(limpiar_rating)
     vinos_filtrados = vinos_filtrados[vinos_filtrados['rating_limpio'] >= rating_min]
     
-    # Ordenar por rating y precio
-    vinos_filtrados = vinos_filtrados.sort_values(['rating_limpio', 'precio_eur'], ascending=[False, True])
+    # Convertir año a entero para eliminar decimales
+    def limpiar_año(año_val):
+        try:
+            if pd.isna(año_val):
+                return "N/A"
+            return int(float(año_val))
+        except:
+            return "N/A"
     
-    return vinos_filtrados.head(6).to_dict('records')
+    vinos_filtrados['año'] = vinos_filtrados['año'].apply(limpiar_año)
+    
+    # Limpiar y simplificar nombres de vinos
+    def limpiar_nombre_vino(nombre):
+        try:
+            if pd.isna(nombre):
+                return "Vino sin nombre"
+            
+            nombre_str = str(nombre)
+            
+            # Remover información extra común
+            import re
+            
+            # Eliminar números de añadas y calificaciones
+            nombre_str = re.sub(r'\b20\d{2}\b', '', nombre_str)
+            
+            # Eliminar precios, puntuaciones y símbolos
+            nombre_str = re.sub(r'[\€\$]\s*\d+[,\.]?\d*', '', nombre_str)  # Precios
+            nombre_str = re.sub(r'\d+[,\.]\d+\s*(puntos?|pts?)', '', nombre_str)  # Puntuaciones
+            nombre_str = re.sub(r'\d+\s*ml\b', '', nombre_str)  # Volúmenes
+            nombre_str = re.sub(r'\b\d+\s*cl\b', '', nombre_str)  # Centilitros
+            
+            # Eliminar información de descuentos y ofertas
+            nombre_str = re.sub(r'\d+%\s*(descuento|off)', '', nombre_str, flags=re.IGNORECASE)
+            nombre_str = re.sub(r'ahorra\d+%?', '', nombre_str, flags=re.IGNORECASE)
+            
+            # Eliminar regiones específicas del nombre (ya se muestran por separado)
+            regiones = ['Campo de Borja', 'Calatayud', 'Almansa', 'Ribera del Duero', 
+                       'Rioja', 'Rías Baixas', 'Toro', 'Bierzo', 'Jumilla', 'Montsant',
+                       'Priorat', 'Penedès', 'Catalunya', 'Valencia', 'Alicante', 'Mallorca']
+            
+            for region in regiones:
+                nombre_str = re.sub(re.escape(region), '', nombre_str, flags=re.IGNORECASE)
+            
+            # Limpiar caracteres especiales y espacios múltiples
+            nombre_str = re.sub(r'[^\w\s\-\.]', ' ', nombre_str)
+            nombre_str = re.sub(r'\s+', ' ', nombre_str)
+            
+            # Dividir por palabras clave que separan el nombre de la bodega
+            separadores = ['Campo', 'Bodega', 'Bodegas', 'Winery', 'Estate', 'Viñedos', 'Cellers']
+            for sep in separadores:
+                if sep in nombre_str:
+                    partes = nombre_str.split(sep)
+                    if len(partes) > 1 and len(partes[0].strip()) > 3:
+                        nombre_str = partes[0].strip()
+                        break
+            
+            # Si contiene comas, tomar solo la primera parte (nombre principal)
+            if ',' in nombre_str:
+                nombre_str = nombre_str.split(',')[0]
+            
+            # Limpiar espacios al inicio y final
+            nombre_str = nombre_str.strip()
+            
+            # Eliminar palabras repetidas o muy cortas al final
+            palabras = nombre_str.split()
+            palabras_filtradas = []
+            
+            for palabra in palabras:
+                # Mantener palabras significativas
+                if len(palabra) >= 3 and palabra.lower() not in ['del', 'de', 'la', 'el', 'los', 'las']:
+                    # Evitar repetir la misma palabra
+                    if not palabras_filtradas or palabra.lower() != palabras_filtradas[-1].lower():
+                        palabras_filtradas.append(palabra)
+            
+            nombre_str = ' '.join(palabras_filtradas)
+            
+            # Si el nombre está vacío después de la limpieza, usar un fallback
+            if not nombre_str or len(nombre_str) < 3:
+                return "Vino seleccionado"
+            
+            # Limitar longitud para mantener la interfaz limpia
+            if len(nombre_str) > 50:
+                nombre_str = nombre_str[:50] + "..."
+            
+            return nombre_str
+            
+        except:
+            return "Vino seleccionado"
+    
+    # Aplicar limpieza de nombres
+    if 'nombre_completo' in vinos_filtrados.columns:
+        vinos_filtrados['nombre_limpio'] = vinos_filtrados['nombre_completo'].apply(limpiar_nombre_vino)
+    elif 'nombre_vino' in vinos_filtrados.columns:
+        vinos_filtrados['nombre_limpio'] = vinos_filtrados['nombre_vino'].apply(limpiar_nombre_vino)
+    else:
+        vinos_filtrados['nombre_limpio'] = "Vino seleccionado"
+    
+    # SISTEMA DE DEDUPLICACIÓN SUPER ESTRICTO PARA ELIMINAR DUPLICADOS EXACTOS
+    def crear_clave_unica_robusta(row):
+        """Crear clave única robusta que detecte duplicados exactos"""
+        try:
+            # Componentes principales para identificar vinos únicos
+            bodega = str(row.get('bodega', '')).lower().strip()
+            año = str(row.get('año', ''))
+            precio = str(row.get('precio_eur', ''))
+            
+            # Normalizar bodega removiendo caracteres especiales
+            import re
+            bodega_clean = re.sub(r'[^\w]', '', bodega)
+            
+            # Crear clave con bodega + año + precio (detecta duplicados exactos)
+            clave = f"{bodega_clean}_{año}_{precio}"
+            
+            return clave.lower()
+        except:
+            return f"vino_unico_{row.name}_{id(row)}"
+    
+    # Aplicar deduplicación SUPER estricta para eliminar duplicados exactos
+    print("🧹 Aplicando deduplicación SUPER ESTRICTA para eliminar duplicados exactos...")
+    vinos_filtrados['clave_duplicados_exactos'] = vinos_filtrados.apply(crear_clave_unica_robusta, axis=1)
+    
+    # Ordenar por calidad antes de eliminar duplicados
+    vinos_filtrados = vinos_filtrados.sort_values(
+        ['rating_limpio', 'precio_eur'], 
+        ascending=[False, True]
+    )
+    
+    # PASO 1: Eliminar duplicados exactos (misma bodega, año, precio)
+    vinos_sin_duplicados_exactos = vinos_filtrados.drop_duplicates(
+        subset=['clave_duplicados_exactos'], 
+        keep='first'
+    ).reset_index(drop=True)
+    
+    print(f"✅ Después de eliminar duplicados exactos: {len(vinos_sin_duplicados_exactos)} vinos")
+    
+    # PASO 2: Aplicar deduplicación por nombre + bodega para diversidad
+    def crear_clave_diversidad(row):
+        """Crear clave para asegurar diversidad de vinos"""
+        try:
+            nombre = str(row.get('nombre_limpio', '')).lower().strip()
+            bodega = str(row.get('bodega', '')).lower().strip()
+            
+            import re
+            # Limpiar nombres para comparación
+            nombre_clean = re.sub(r'[^\w]', '', nombre)
+            bodega_clean = re.sub(r'[^\w]', '', bodega)
+            
+            # Crear clave de diversidad
+            clave = f"{nombre_clean}_{bodega_clean}"
+            
+            return clave.lower()
+        except:
+            return f"diversidad_{row.name}"
+    
+    vinos_sin_duplicados_exactos['clave_diversidad'] = vinos_sin_duplicados_exactos.apply(crear_clave_diversidad, axis=1)
+    
+    # Eliminar vinos muy similares para asegurar diversidad
+    vinos_diversos = vinos_sin_duplicados_exactos.drop_duplicates(
+        subset=['clave_diversidad'], 
+        keep='first'
+    ).reset_index(drop=True)
+    
+    print(f"✅ Después de asegurar diversidad: {len(vinos_diversos)} vinos únicos")
+    
+    # PASO 3: Si aún no tenemos suficientes, usar estrategia de diversificación forzada
+    if len(vinos_diversos) < 6:
+        print(f"⚠️ Solo {len(vinos_diversos)} vinos diversos, aplicando diversificación forzada...")
+        
+        # Diversificar por bodega
+        vinos_por_bodega = vinos_sin_duplicados_exactos.drop_duplicates(
+            subset=['bodega'], 
+            keep='first'
+        )
+        
+        if len(vinos_por_bodega) >= 6:
+            vinos_diversos = vinos_por_bodega.head(6)
+            print(f"✅ Diversificación por bodega: {len(vinos_diversos)} vinos únicos")
+        else:
+            # Si no hay suficientes bodegas, usar lo que tenemos
+            vinos_diversos = vinos_sin_duplicados_exactos.head(6)
+            print(f"✅ Usando los mejores disponibles: {len(vinos_diversos)} vinos")
+    
+    # Seleccionar exactamente 6 vinos
+    vinos_finales = vinos_diversos.head(6).copy()
+    
+    # VERIFICACIÓN FINAL EXHAUSTIVA
+    print(f"🔍 VERIFICACIÓN FINAL EXHAUSTIVA:")
+    
+    # Verificar duplicados por bodega + año + precio
+    verificacion_exactos = []
+    for _, vino in vinos_finales.iterrows():
+        clave_exacta = f"{vino['bodega']}_{vino['año']}_{vino['precio_eur']}"
+        verificacion_exactos.append(clave_exacta)
+    
+    duplicados_exactos = len(verificacion_exactos) - len(set(verificacion_exactos))
+    
+    print(f"   � Vinos seleccionados: {len(vinos_finales)}")
+    print(f"   🔄 Duplicados exactos detectados: {duplicados_exactos}")
+    
+    # Si hay duplicados exactos, aplicar filtro final
+    if duplicados_exactos > 0:
+        print("⚠️ DUPLICADOS EXACTOS DETECTADOS - Aplicando filtro final")
+        
+        vinos_finales_unicos = []
+        claves_usadas = set()
+        
+        for _, vino in vinos_sin_duplicados_exactos.iterrows():
+            clave_exacta = f"{vino['bodega']}_{vino['año']}_{vino['precio_eur']}"
+            if clave_exacta not in claves_usadas and len(vinos_finales_unicos) < 6:
+                claves_usadas.add(clave_exacta)
+                vinos_finales_unicos.append(vino.to_dict())
+        
+        print(f"✅ Filtro final aplicado: {len(vinos_finales_unicos)} vinos únicos garantizados")
+        return vinos_finales_unicos
+    
+    # Mostrar los vinos seleccionados para debugging
+    print("🍷 VINOS SELECCIONADOS:")
+    for i, vino in enumerate(vinos_finales.iterrows(), 1):
+        nombre = vino[1]['nombre_limpio']
+        bodega = vino[1]['bodega']
+        año = vino[1]['año']
+        rating = vino[1]['rating_limpio']
+        precio = vino[1]['precio_eur']
+        print(f"   {i}. {nombre} - {bodega} ({año}) - ⭐{rating:.2f} - €{precio:.2f}")
+    
+    return vinos_finales.to_dict('records')
 
 def validate_registration_data(data):
     """Valida los datos de registro"""
@@ -372,6 +614,10 @@ def validate_registration_data(data):
         except ValueError:
             errors.append('Fecha de nacimiento inválida')
     
+    # Log de errores si los hay
+    if errors:
+        print(f"🔍 Errores de validación encontrados: {errors}")
+    
     return errors
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -391,16 +637,29 @@ def register():
                 'terms': request.form.get('terms') == 'on'
             }
             
+            # LOG: Datos recibidos (sin password)
+            log_data = {k: v for k, v in data.items() if k not in ['password', 'confirmPassword']}
+            print(f"📝 Intento de registro: {log_data}")
+            
             # Validar términos y condiciones
             if not data['terms']:
+                print(f"❌ Registro fallido - Términos no aceptados: {data['firstName']} {data['lastName']}")
                 flash('Debes aceptar los términos y condiciones', 'error')
                 return render_template('register.html')
             
             # Validar datos
             errors = validate_registration_data(data)
             if errors:
+                print(f"❌ Registro fallido - Errores de validación: {errors}")
                 for error in errors:
                     flash(error, 'error')
+                return render_template('register.html')
+            
+            # Verificar si el email ya existe
+            existing_user = User.query.filter_by(email=data['email']).first()
+            if existing_user:
+                print(f"❌ Registro fallido - Email duplicado: {data['email']}")
+                flash('Este email ya está registrado. ¿Ya tienes una cuenta?', 'error')
                 return render_template('register.html')
             
             # Crear nuevo usuario
@@ -418,12 +677,20 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             
+            print(f"✅ Registro exitoso: {new_user.get_full_name()} ({new_user.email}) - ID: {new_user.id}")
+            
             flash(f'¡Bienvenido {new_user.get_full_name()}! Tu cuenta ha sido creada exitosamente.', 'success')
             flash('Ahora puedes iniciar sesión con tu email y contraseña.', 'info')
             
             return redirect(url_for('login'))
             
+        except ValueError as ve:
+            print(f"❌ Error de validación en registro: {ve}")
+            db.session.rollback()
+            flash('Error en los datos proporcionados. Verifica la fecha de nacimiento.', 'error')
+            return render_template('register.html')
         except Exception as e:
+            print(f"❌ Error inesperado en registro: {e}")
             db.session.rollback()
             flash(f'Error al crear la cuenta: {str(e)}', 'error')
             return render_template('register.html')
@@ -508,6 +775,7 @@ def sommelier():
             precio_min = float(request.form['precio_min'])
             precio_max = float(request.form['precio_max'])
             rating_min = float(request.form.get('rating_min', 4.0))
+            tipo_vino = request.form.get('tipo_vino', 'Todos')
             ocasion = request.form.get('ocasion', 'general')
             gusto = request.form.get('gusto', 'equilibrado')
             
@@ -525,7 +793,7 @@ def sommelier():
             prediccion, confianza = predecir_calidad_vino_completo(precio_promedio, rating_objetivo, 2021)
             
             # Buscar vinos similares
-            vinos_recomendados = buscar_vinos_similares(precio_min, precio_max, rating_min)
+            vinos_recomendados = buscar_vinos_similares(precio_min, precio_max, rating_min, tipo_vino)
             
             # Preparar contexto de respuesta
             prediction_text = f"Recomendación: {prediccion}"
@@ -590,8 +858,9 @@ def api_recomendar():
     precio_min = float(request.args.get('precio_min', 10))
     precio_max = float(request.args.get('precio_max', 50))
     rating_min = float(request.args.get('rating_min', 4.0))
+    tipo_vino = request.args.get('tipo_vino', 'Todos')
     
-    vinos = buscar_vinos_similares(precio_min, precio_max, rating_min)
+    vinos = buscar_vinos_similares(precio_min, precio_max, rating_min, tipo_vino)
     return jsonify({'recomendaciones': vinos})
 
 @app.route('/about')

@@ -212,6 +212,18 @@
 }
 
 /* Efectos de hover mejorados */
+.btn-wine {
+  background: linear-gradient(135deg, #722f37 0%, #8b3a3a 100%) !important;
+  border: 2px solid #722f37 !important;
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 12px 24px !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: all 0.3s ease !important;
+}
+
 .btn-wine:hover {
   background: linear-gradient(135deg, #8b3a3a 0%, #722f37 100%);
   transform: translateY(-2px);
