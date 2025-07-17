@@ -13,6 +13,10 @@
       rel="stylesheet"
     />
     <style>
+      .no-decoration-block {
+        text-decoration: none;
+        display: block;
+      }
       body {
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
           url("/static/images/gardenWineDrinkers.jpg");
@@ -206,6 +210,7 @@
         overflow: hidden;
         border-radius: 15px;
         margin: 20px 0;
+        cursor: pointer;
       }
 
       .wine-gallery img {
@@ -362,23 +367,31 @@
       </div>
     </section>
 
-    <!-- Galería de Imágenes Wine IA -->
-    <section class="container my-5">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="wine-gallery">
-            <img
-              src="/static/images/womanDrinkingWine.jpg"
-              alt="Degustación profesional de vinos"
-            />
-            <div class="image-overlay">
-              <div class="text-center">
-                <i class="fas fa-wine-glass fa-2x mb-2"></i>
-                <br />
-                Experiencia Premium
+          <a
+            href="https://turismodevino.com/"
+            target="_blank"
+            rel="noopener"
+            class="no-decoration-block"
+            title="Visitar Turismo de Vino"
+         
+            <div class="wine-gallery">
+            rel="noopener"
+            style="text-decoration: none; display: block"
+          >
+            <div class="wine-gallery">
+              <img
+                src="/static/images/womanDrinkingWine.jpg"
+                alt="Degustación profesional de vinos"
+              />
+              <div class="image-overlay">
+                <div class="text-center">
+                  <i class="fas fa-wine-glass fa-2x mb-2"></i>
+                  <br />
+                  Experiencia Premium
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
         <div class="col-md-6">
           <div class="wine-gallery">

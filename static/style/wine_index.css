@@ -1,3 +1,55 @@
+/* Card Experiencia Premium */
+.premium-card-link {
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.premium-card {
+  position: relative;
+  min-height: 180px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80")
+    center/cover no-repeat;
+  box-shadow: 0 8px 24px rgba(114, 47, 55, 0.18);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.premium-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(114, 47, 55, 0.28);
+}
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(114, 47, 55, 0.45);
+  z-index: 1;
+}
+.premium-content {
+  z-index: 2;
+  color: #fff;
+  position: relative;
+  padding: 2.5rem 1rem 1.5rem 1rem;
+}
+.premium-content h5 {
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 1.3rem;
+}
+.premium-content p {
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+/* Asegura que los enlaces tipo botón muestren el cursor de mano */
+a.btn,
+a.btn:visited,
+a.btn:active,
+a.btn:focus,
+a.btn:hover {
+  cursor: pointer;
+}
 /* Estilos para la página principal del clasificador de vinos */
 body {
   background: linear-gradient(rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6)),

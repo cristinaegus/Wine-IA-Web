@@ -356,18 +356,26 @@
           <!-- Información del Sistema -->
           <div class="mt-4">
             <div class="row">
-              <div class="col-md-4">
-                <div class="card">
-                  <div class="card-body">
-                    <h6 class="card-title">
-                      <i class="fas fa-brain"></i> Sistema Inteligente
-                    </h6>
-                    <p class="card-text small">
-                      Recomendaciones basadas en Machine Learning y datos reales
-                      de Vivino.
-                    </p>
+              <div class="col-md-6 mb-3">
+                <a
+                  href="https://turismodevino.com/"
+                  target="_blank"
+                  rel="noopener"
+                  class="premium-card-link"
+                >
+                  <div
+                    class="premium-card d-flex flex-column justify-content-center align-items-center text-center"
+                  >
+                    <div class="premium-overlay"></div>
+                    <div class="premium-content position-relative">
+                      <i class="fas fa-crown fa-2x mb-2"></i>
+                      <h5 class="mb-1">Experiencia Premium</h5>
+                      <p class="mb-0">
+                        Descubre enoturismo y planes exclusivos
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </a>
               </div>
               <div class="col-md-4">
                 <div class="card">
@@ -471,6 +479,19 @@
             '<i class="fas fa-spinner fa-spin"></i> Buscando...';
           submitBtn.disabled = true;
         });
+
+      // Forzar apertura en nueva pestaña para el botón Experiencia Premium
+      document.addEventListener("DOMContentLoaded", function () {
+        var premiumBtn = document.querySelector(
+          'a[href="https://turismodevino.com/"]'
+        );
+        if (premiumBtn) {
+          premiumBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            window.open("https://turismodevino.com/", "_blank", "noopener");
+          });
+        }
+      });
     </script>
   </body>
 </html>
