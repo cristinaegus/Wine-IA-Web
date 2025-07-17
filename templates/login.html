@@ -37,8 +37,8 @@
         border-radius: 20px;
         padding: 40px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
         max-width: 400px;
         width: 100%;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
@@ -156,6 +156,14 @@
         color: #ffd700;
         text-decoration: none;
       }
+      .forgot-password-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+      }
+      .forgot-password-link:hover {
+        color: #ffd700;
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
@@ -246,17 +254,16 @@
             <i class="fab fa-facebook"></i> Continuar con Facebook
           </a>
         </div>
-
-        <div class="text-center">
-          <p>
-            ¿No tienes cuenta?
-            <a href="/register" style="color: #ffd700; text-decoration: none">
-              Regístrate aquí
+          <a href="#"
+            class="forgot-password-link"
+          >
+            ¿Olvidaste tu contraseña?
+          </a>
             </a>
           </p>
           <a
             href="#"
-            style="color: rgba(255, 255, 255, 0.7); text-decoration: none"
+            class="forgot-password-link"
           >
             ¿Olvidaste tu contraseña?
           </a>

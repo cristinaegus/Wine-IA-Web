@@ -29,8 +29,11 @@ class Config:
     }
     
     # Archivos de datos
-    CSV_PATTERN = 'vivino_scraping_completo_*.csv'
-    CSV_FILES = list(DATA_DIR.glob(CSV_PATTERN)) if DATA_DIR.exists() else []
+    CSV_PATTERN_1 = 'vivino_scraping_completo_*.csv'
+    CSV_PATTERN_2 = 'resumen_scraping_completo_*.csv'
+    CSV_FILES_1 = list(DATA_DIR.glob(CSV_PATTERN_1)) if DATA_DIR.exists() else []
+    CSV_FILES_2 = list(DATA_DIR.glob(CSV_PATTERN_2)) if DATA_DIR.exists() else []
+    CSV_FILES = CSV_FILES_1 + CSV_FILES_2  # Combinar ambos tipos de archivos
     LATEST_CSV = max(CSV_FILES, key=os.path.getctime) if CSV_FILES else None
     
     # Archivos del modelo actualizado (buscar en static primero, luego directorios alternativos)

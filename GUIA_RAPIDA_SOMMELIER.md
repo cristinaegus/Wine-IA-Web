@@ -113,6 +113,76 @@ PORT = 8080
 - Configuración en archivos locales
 - Sin autenticación requerida
 
+## 🔧 ¿Qué es la Paralelización de Tareas Computacionales?
+
+La **paralelización de tareas computacionales** significa ejecutar múltiples operaciones al mismo tiempo en lugar de una por una, aprovechando varios núcleos del procesador o hilos para acelerar el procesamiento.
+
+### 🔄 **¿Qué es la Paralelización?**
+
+En lugar de hacer esto (secuencial):
+```
+Tarea 1 → Tarea 2 → Tarea 3 → Tarea 4
+```
+
+La paralelización hace esto (paralelo):
+```
+Tarea 1 ┐
+Tarea 2 ├─ Al mismo tiempo
+Tarea 3 ┤
+Tarea 4 ┘
+```
+
+### 🍷 **En el contexto de Wine IA:**
+
+#### **1. Entrenamiento de Modelos ML**
+```python
+# Sin paralelización: 1 modelo a la vez
+for model in models:
+    train_model(model)  # 30 segundos cada uno = 5 minutos total
+
+# Con paralelización: varios modelos simultáneamente  
+joblib.Parallel(n_jobs=4)(
+    joblib.delayed(train_model)(model) for model in models
+)  # 30 segundos total
+```
+
+#### **2. Procesamiento de Datos**
+```python
+# Procesar 1000 vinos uno por uno vs. 100 a la vez en 10 grupos paralelos
+```
+
+#### **3. Búsquedas y Filtros**
+```python
+# Buscar en múltiples fuentes de datos simultáneamente
+# Calcular recomendaciones para varios usuarios a la vez
+```
+
+### ⚡ **Ventajas:**
+
+- **🚀 Velocidad**: Tareas que tomaban 10 minutos ahora toman 2-3 minutos
+- **💪 Eficiencia**: Usa todo el poder del procesador
+- **📈 Escalabilidad**: Puede manejar más usuarios y datos
+
+### 🛠️ **Cómo joblib lo hace:**
+
+```python
+# Ejemplo: Entrenar 5 modelos en paralelo
+from joblib import Parallel, delayed
+
+def entrenar_modelo(parametros):
+    # Entrenar modelo con estos parámetros
+    return modelo_entrenado
+
+# Ejecutar en paralelo usando 4 núcleos del CPU
+modelos = Parallel(n_jobs=4)(
+    delayed(entrenar_modelo)(params) for params in lista_parametros
+)
+```
+
+**En resumen**: paralelización = hacer varias cosas a la vez = más rápido = mejor experiencia de usuario 🚀
+
 ---
 
 **¿Necesitas ayuda?** Revisa `README_SOMMELIER.md` para documentación completa.
+
+

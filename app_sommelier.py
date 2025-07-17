@@ -488,8 +488,13 @@ def home():
     """Página de inicio con navegación"""
     return render_template('home.html')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    """Página principal que redirige a home para registro de usuarios"""
+    return redirect(url_for('home'))
+
+@app.route('/sommelier', methods=['GET', 'POST'])
+def sommelier():
     if request.method == 'POST':
         try:
             # Verificar que el modelo esté cargado
