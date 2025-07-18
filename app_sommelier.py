@@ -1,14 +1,16 @@
+import os
 import pickle
 import pandas as pd
 import numpy as np
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
-import os
 import glob
 import warnings
+import json
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
+from datetime import datetime, timedelta
 from config_sommelier import get_config
 from models import db, bcrypt, User, UserSession, WineRecommendation
-from datetime import datetime, timedelta
-import json
+from chatbot import tavily_search_endpoint, chatbot_endpoint
+
 warnings.filterwarnings("ignore")
 
 # Configuración de la aplicación
@@ -22,27 +24,19 @@ bcrypt.init_app(app)
 
 # Cargar el modelo de Vivino y datos al iniciar la aplicación
 try:
-    # Cargar modelos usando configuración centralizada
     model, scaler, label_encoder, model_info = config.cargar_modelo()
-    
     if model is None:
         raise FileNotFoundError("No se pudieron cargar los modelos")
-    
-    # Mostrar información del modelo si está disponible
     if model_info:
         print(f"🍷 Sommelier usando modelo v{model_info.get('version', 'desconocida')}")
         print(f"📊 Precisión: {model_info.get('accuracy', 'N/A')}")
         print(f"🎯 Features: {len(model_info.get('caracteristicas', []))}")
-        
-        # Cargar label encoders del modelo
         label_encoders = model_info.get('label_encoders', {})
         caracteristicas_modelo = model_info.get('caracteristicas', [])
         print(f"🔧 Label encoders disponibles: {list(label_encoders.keys())}")
     else:
         label_encoders = {}
         caracteristicas_modelo = []
-    
-    # Cargar datos del último scraping usando configuración
     if config.LATEST_CSV:
         df_vinos = pd.read_csv(config.LATEST_CSV)
         print(f"✅ Datos cargados desde: {config.LATEST_CSV}")
@@ -50,27 +44,9 @@ try:
     else:
         df_vinos = pd.DataFrame()
         print("⚠️ No se encontraron archivos de scraping")
-    
     print("✅ Modelo Sommelier y datos cargados exitosamente")
 except FileNotFoundError as e:
     print(f"⚠️ Archivos del modelo no encontrados: {e}")
-    model = None
-    scaler = None
-    label_encoder = None
-    df_vinos = pd.DataFrame()
-
-def categorizar_precio(precio):
-    """Categorizar precio según rangos"""
-    if precio >= 40:
-        return 'Premium'
-    elif precio >= 25:
-        return 'Alto'
-    elif precio >= 18:
-        return 'Medio'
-    elif precio >= 12:
-        return 'Económico'
-    else:
-        return 'Muy Económico'
 
 def categorizar_popularidad(num_reviews):
     """Categorizar popularidad según número de reviews"""
@@ -82,6 +58,30 @@ def categorizar_popularidad(num_reviews):
         return 'Conocido'
     else:
         return 'Nicho'
+
+def categorizar_precio(precio):
+    """Categorizar precio según rangos habituales"""
+    if precio <= 10:
+        return 'Económico'
+    elif precio <= 20:
+        return 'Accesible'
+    elif precio <= 35:
+        return 'Medio'
+    elif precio <= 60:
+        return 'Premium'
+    else:
+        return 'Lujo'
+
+
+# Endpoint Tavily Search
+@app.route('/api/tavily-search', methods=['POST'])
+def tavily_search():
+    return tavily_search_endpoint()
+
+# Endpoint Chatbot (para compatibilidad con frontend antiguo)
+@app.route('/api/chatbot', methods=['POST'])
+def chatbot():
+    return chatbot_endpoint(chat=None)
 
 def predecir_calidad_vino_completo(precio, rating, año, bodega="Desconocida", region="España", num_reviews=500):
     """Predice la categoría de calidad usando el modelo completo con 15 características"""
@@ -323,30 +323,27 @@ def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0, tipo_vino=Non
         print("❌ No se encontraron vinos con los criterios especificados")
         return []
     
-    # Limpiar y convertir rating
-    def limpiar_rating(rating_str):
-        try:
-            if isinstance(rating_str, (int, float)):
-                return float(rating_str)
-            import re
-            numeros = re.findall(r'(\d+\.?\d*)', str(rating_str))
-            if numeros:
-                return float(numeros[0])
-            return 4.0
-        except:
-            return 4.0
-    
-    vinos_filtrados['rating_limpio'] = vinos_filtrados['rating'].apply(limpiar_rating)
-    vinos_filtrados = vinos_filtrados[vinos_filtrados['rating_limpio'] >= rating_min]
-    
-    # Convertir año a entero para eliminar decimales
-    def limpiar_año(año_val):
-        try:
-            if pd.isna(año_val):
-                return "N/A"
-            return int(float(año_val))
-        except:
+# Limpiar y convertir rating
+def limpiar_rating(rating_str):
+    try:
+        if isinstance(rating_str, (int, float)):
+            return float(rating_str)
+        import re
+        numeros = re.findall(r'(\d+\.?\d*)', str(rating_str))
+        if numeros:
+            return float(numeros[0])
+        return 4.0
+    except:
+        return 4.0
+
+# Convertir año a entero para eliminar decimales
+def limpiar_año(año_val):
+    try:
+        if pd.isna(año_val):
             return "N/A"
+        return int(float(año_val))
+    except:
+        return "N/A"
     
     vinos_filtrados['año'] = vinos_filtrados['año'].apply(limpiar_año)
     
@@ -880,21 +877,16 @@ def about():
 
 if __name__ == '__main__':
     print("🍷 Iniciando Sommelier Inteligente...")
-    
     # Crear tablas de base de datos
     with app.app_context():
         try:
             print("📊 Conectando a la base de datos PostgreSQL...")
             db.create_all()
             print("✅ Tablas de base de datos creadas/verificadas")
-            
-            # Verificar conexión
             user_count = User.query.count()
             print(f"👥 Usuarios registrados: {user_count}")
-            
         except Exception as e:
             print(f"❌ Error con la base de datos: {e}")
             print("⚠️ La aplicación funcionará sin registro de usuarios")
-    
     print(f"🌐 Servidor disponible en: http://{config.HOST}:{config.PORT}")
     app.run(debug=config.DEBUG, host=config.HOST, port=config.PORT)
