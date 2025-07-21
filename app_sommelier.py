@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from config_sommelier import get_config
 from models import db, bcrypt, User, UserSession, WineRecommendation
 from chatbot import chatbot_endpoint, chat
+from admin import admin_bp
 
 warnings.filterwarnings("ignore")
 
@@ -17,6 +18,9 @@ warnings.filterwarnings("ignore")
 config = get_config('development')
 app = Flask(__name__)
 app.config.from_object(config)
+
+# Registrar blueprint de administración
+app.register_blueprint(admin_bp)
 
 # Inicializar extensiones
 db.init_app(app)
