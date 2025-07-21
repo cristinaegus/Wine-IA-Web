@@ -254,3 +254,26 @@
     transform: rotate(360deg);
   }
 }
+
+.btn-login {
+  font-size: 1.1rem;
+  /* ...otros estilos existentes... */
+  background: transparent;
+  color: #ffd700 !important;
+  border: 2px solid #ffd700 !important;
+  font-weight: bold;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s;
+}
+/* Color amarillo para el icono dentro del botón Inicio */
+.btn-login i {
+  color: #ffd700 !important;
+}
+.btn-login:hover {
+  background: #ffd700;
+  color: #fff !important;
+  border-color: #ffd700;
+}
+.btn-login:hover i {
+  color: #fff !important;
+}

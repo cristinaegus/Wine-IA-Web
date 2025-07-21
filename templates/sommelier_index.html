@@ -76,13 +76,27 @@
     <div class="container-fluid">
       <div class="wine-container">
         <!-- Header -->
-        <div class="sommelier-header">
-          <i class="fas fa-user-tie sommelier-icon"></i>
-          <h1 class="mb-0">🍷 Sommelier Inteligente</h1>
-          <p class="mb-0 mt-2">
-            Sistema de Recomendación Personalizada de Vinos Españoles
-          </p>
-          <small>Basado en datos reales de Vivino</small>
+        <div
+          class="sommelier-header position-relative"
+          style="padding-top: 40px"
+        >
+          <div
+            class="d-flex flex-column align-items-center justify-content-center w-100"
+          >
+            <i class="fas fa-user-tie sommelier-icon"></i>
+            <h1 class="mb-0 text-center w-100">🍷 Sommelier Inteligente</h1>
+            <p class="mb-0 mt-2 text-center w-100">
+              Sistema de Recomendación Personalizada de Vinos Españoles
+            </p>
+            <small class="d-block text-center w-100"
+              >Basado en datos reales de Vivino</small
+            >
+          </div>
+          <div class="position-absolute top-0 end-0 m-4">
+            <a href="/home" class="btn btn-login">
+              <i class="fas fa-home"></i> Inicio
+            </a>
+          </div>
         </div>
 
         <!-- Formulario de Recomendación -->

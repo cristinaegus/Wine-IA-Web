@@ -100,4 +100,4 @@ else:
 
 print("\n🍷 Para ejecutar el Sommelier Inteligente:")
 print("   python app_sommelier.py")
-print("   Luego abrir: http://127.0.0.1:5000")
+print("   Luego abrir: http://127.0.0.1:5001")
