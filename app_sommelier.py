@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, url
 from datetime import datetime, timedelta
 from config_sommelier import get_config
 from models import db, bcrypt, User, UserSession, WineRecommendation
-from chatbot import tavily_search_endpoint, chatbot_endpoint
+from chatbot import chatbot_endpoint, chat
 
 warnings.filterwarnings("ignore")
 
@@ -73,15 +73,11 @@ def categorizar_precio(precio):
         return 'Lujo'
 
 
-# Endpoint Tavily Search
-@app.route('/api/tavily-search', methods=['POST'])
-def tavily_search():
-    return tavily_search_endpoint()
 
 # Endpoint Chatbot (para compatibilidad con frontend antiguo)
 @app.route('/api/chatbot', methods=['POST'])
 def chatbot():
-    return chatbot_endpoint(chat=None)
+    return chatbot_endpoint(chat)
 
 def predecir_calidad_vino_completo(precio, rating, año, bodega="Desconocida", region="España", num_reviews=500):
     """Predice la categoría de calidad usando el modelo completo con 15 características"""

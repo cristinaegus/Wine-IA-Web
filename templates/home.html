@@ -330,7 +330,10 @@
         });
       });
 
-      observer.observe(document.querySelector(".stats-section"));
+      const statsSection = document.querySelector(".stats-section");
+      if (statsSection) {
+        observer.observe(statsSection);
+      }
     </script>
   </body>
 </html>
