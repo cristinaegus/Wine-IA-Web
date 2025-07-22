@@ -13,35 +13,22 @@
       rel="stylesheet"
     />
     <link
-      href="{{ url_for('static', filename='style/sommelier.css') }}?v=4"
+      href="{{ url_for('static', filename='style/sommelier.css') }}?v=2"
       rel="stylesheet"
     />
     <style>
       .wine-card {
         border: 2px solid #722f37;
         border-radius: 15px;
-        background: linear-gradient(135deg, #fff7f0 0%, #fbeee6 100%);
+        background: linear-gradient(135deg, #2c1810 0%, #3d2317 100%);
         padding: 20px;
         margin: 10px 0;
-        box-shadow: 0 4px 15px rgba(114, 47, 55, 0.15);
+        box-shadow: 0 4px 15px rgba(114, 47, 55, 0.3);
         transition: transform 0.3s ease;
-        color: #3d2317;
       }
       .wine-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(114, 47, 55, 0.25);
-      }
-      .wine-card.empty {
-        background: repeating-linear-gradient(
-          135deg,
-          #fbeee6,
-          #fbeee6 20px,
-          #f5e1d2 20px,
-          #f5e1d2 40px
-        );
-        color: #b0a7a7;
-        opacity: 0.8;
-        border-style: dashed;
+        box-shadow: 0 8px 25px rgba(114, 47, 55, 0.4);
       }
       .wine-name {
         font-size: 1rem;
@@ -89,24 +76,13 @@
     <div class="container-fluid">
       <div class="wine-container">
         <!-- Header -->
-        <div class="sommelier-header position-relative header-padding">
-          <div
-            class="d-flex flex-column align-items-center justify-content-center w-100"
-          >
-            <i class="fas fa-user-tie sommelier-icon"></i>
-            <h1 class="mb-0 text-center w-100">🍷 Sommelier Inteligente</h1>
-            <p class="mb-0 mt-2 text-center w-100">
-              Sistema de Recomendación Personalizada de Vinos Españoles
-            </p>
-            <small class="d-block text-center w-100"
-              >Basado en datos reales de Vivino</small
-            >
-          </div>
-          <div class="position-absolute top-0 end-0 m-4">
-            <a href="/home" class="btn btn-login">
-              <i class="fas fa-home"></i> Inicio
-            </a>
-          </div>
+        <div class="sommelier-header">
+          <i class="fas fa-user-tie sommelier-icon"></i>
+          <h1 class="mb-0">🍷 Sommelier Inteligente</h1>
+          <p class="mb-0 mt-2">
+            Sistema de Recomendación Personalizada de Vinos Españoles
+          </p>
+          <small>Basado en datos reales de Vivino</small>
         </div>
 
         <!-- Formulario de Recomendación -->
@@ -117,31 +93,6 @@
 
           <form method="POST" id="sommelierForm">
             <div class="row">
-              <!-- Tipo de Vino -->
-              <div class="col-md-12 mb-4">
-                <div class="parameter-card">
-                  <label for="tipo_vino" class="form-label">
-                    <i class="fas fa-wine-glass"></i> Tipo de Vino
-                  </label>
-                  <select
-                    class="form-select"
-                    id="tipo_vino"
-                    name="tipo_vino"
-                    required
-                  >
-                    <option value="">Selecciona el tipo de vino</option>
-                    <option value="Tinto">🔴 Tinto</option>
-                    <option value="Blanco">⚪ Blanco</option>
-                    <option value="Todos">🍷 Todos los tipos</option>
-                  </select>
-                  <small class="form-text text-muted">
-                    <i class="fas fa-info-circle"></i>
-                    Elige entre vinos tintos o blancos, o selecciona "Todos"
-                    para ver ambos tipos
-                  </small>
-                </div>
-              </div>
-
               <!-- Presupuesto -->
               <div class="col-md-6 mb-3">
                 <div class="parameter-card">
@@ -290,12 +241,12 @@
           </div>
 
           <!-- Vinos Recomendados -->
-          {% set total_cards = vinos_recomendados|length if vinos_recomendados
-          else 0 %} {% if vinos_recomendados and total_cards > 0 %}
+          {% if vinos_recomendados %}
           <div class="mt-4">
             <h4 class="text-center mb-4">
               <i class="fas fa-wine-bottle"></i> Vinos Recomendados Para Ti
             </h4>
+
             <div class="row">
               {% for vino in vinos_recomendados %}
               <div class="col-md-6 mb-3">
@@ -304,40 +255,36 @@
                   <div class="mb-2">
                     <h6 class="text-warning mb-1 wine-name">
                       <i class="fas fa-wine-glass"></i>
-                      {% if vino.nombre_limpio %} {% set nombre_final =
-                      vino.nombre_limpio.split('(')[0].split(',')[0].split('-')[0].strip()
-                      %} {{ nombre_final }} {% elif vino.nombre_completo %} {%
-                      set nombre_final =
-                      vino.nombre_completo.split('(')[0].split(',')[0].split('-')[0].strip()
-                      %} {{ nombre_final[:50] }}{% if nombre_final|length > 50
-                      %}...{% endif %} {% elif vino.nombre_vino %} {% set
-                      nombre_final =
-                      vino.nombre_vino.split('(')[0].split(',')[0].split('-')[0].strip()
-                      %} {{ nombre_final[:50] }}{% if nombre_final|length > 50
-                      %}...{% endif %} {% else %} Vino de {{ vino.bodega }} {%
-                      endif %} {% if vino.año and vino.año != "N/A" %} ({{
-                      vino.año }}){% endif %}
+                      {% if vino.nombre_completo %} {{
+                      vino.nombre_completo[:120] }}{% if
+                      vino.nombre_completo|length > 120 %}...{% endif %} {% elif
+                      vino.nombre_vino %} {% set wine_name =
+                      vino.nombre_vino.split(',')[0] if ',' in vino.nombre_vino
+                      else vino.nombre_vino %} {% set clean_name =
+                      wine_name.split('4,')[0] if '4,' in wine_name else
+                      wine_name %} {{ clean_name[:120] }}{% if clean_name|length
+                      > 120 %}...{% endif %} {% else %} Vino de {{ vino.bodega
+                      }} {% endif %}
                     </h6>
                     <div
                       class="d-flex justify-content-between align-items-center"
                     >
                       <small class="text-light">
-                        <i class="fas fa-industry"></i>
-                        {% set bodega_limpia =
-                        vino.bodega.split(',')[0].split('(')[0].split('-')[0].strip()
-                        if vino.bodega else 'Bodega' %} {{ bodega_limpia }}
+                        <i class="fas fa-industry"></i> {{ vino.bodega }}
                       </small>
                       <span class="price-range"
                         >{{ "%.2f"|format(vino.precio_eur) }}€</span
                       >
                     </div>
                   </div>
+
                   <p class="text-light mb-2">
                     <small>
                       <i class="fas fa-map-marker-alt"></i> {{ vino.region }}
                       <i class="fas fa-calendar ms-2"></i> {{ vino.año }}
                     </small>
                   </p>
+
                   <div
                     class="d-flex justify-content-between align-items-center"
                   >
@@ -350,6 +297,7 @@
                       {{ vino.num_reviews }} reviews
                     </small>
                   </div>
+
                   {% if vino.categoria_calidad %}
                   <div class="mt-2">
                     <small class="badge bg-info"
@@ -357,6 +305,7 @@
                     >
                   </div>
                   {% endif %}
+
                   <div class="mt-2">
                     <a
                       href="{{ vino.url }}"
@@ -368,18 +317,6 @@
                   </div>
                 </div>
               </div>
-              {% endfor %} {# Mostrar cards vacías si hay menos de 4 vinos #} {%
-              for i in range(4 - total_cards) %}
-              <div class="col-md-6 mb-3">
-                <div class="wine-card empty text-center">
-                  <h6 class="text-secondary mb-1 wine-name">
-                    <i class="fas fa-wine-glass-alt"></i> Próximamente
-                  </h6>
-                  <p class="text-light mb-2">
-                    <small>Más recomendaciones pronto...</small>
-                  </p>
-                </div>
-              </div>
               {% endfor %}
             </div>
           </div>
@@ -389,7 +326,20 @@
           <div class="mt-4">
             <div class="row">
               <div class="col-md-4">
-                <div class="wine-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">
+                      <i class="fas fa-brain"></i> Sistema Inteligente
+                    </h6>
+                    <p class="card-text small">
+                      Recomendaciones basadas en Machine Learning y datos reales
+                      de Vivino.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card">
                   <div class="card-body">
                     <h6 class="card-title">
                       <i class="fas fa-database"></i> Datos Actualizados
@@ -402,7 +352,7 @@
                 </div>
               </div>
               <div class="col-md-4">
-                <div class="wine-card">
+                <div class="card">
                   <div class="card-body">
                     <h6 class="card-title">
                       <i class="fas fa-target"></i> Personalizado
@@ -490,19 +440,6 @@
             '<i class="fas fa-spinner fa-spin"></i> Buscando...';
           submitBtn.disabled = true;
         });
-
-      // Forzar apertura en nueva pestaña para el botón Experiencia Premium
-      document.addEventListener("DOMContentLoaded", function () {
-        var premiumBtn = document.querySelector(
-          'a[href="https://turismodevino.com/"]'
-        );
-        if (premiumBtn) {
-          premiumBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            window.open("https://turismodevino.com/", "_blank", "noopener");
-          });
-        }
-      });
     </script>
   </body>
 </html>

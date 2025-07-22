@@ -1,6 +1,41 @@
 from flask import Blueprint, render_template, redirect, url_for, request, session, flash
 from werkzeug.security import check_password_hash
-from datos import get_all_users, add_user, edit_user, delete_user, get_user_by_id
+from models import db, User
+
+# Funciones auxiliares para gestión de usuarios
+def get_all_users():
+    return User.query.all()
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
+
+def add_user(username, email, password):
+    from datetime import date
+    # Por simplicidad, se crean usuarios con datos mínimos y valores por defecto
+    user = User(
+        email=email,
+        password=password,
+        first_name=username,
+        last_name='',
+        birth_date=date(2000,1,1)
+    )
+    db.session.add(user)
+    db.session.commit()
+
+def edit_user(user_id, username, email, password):
+    user = User.query.get(user_id)
+    if user:
+        user.email = email
+        user.first_name = username
+        if password:
+            user.set_password(password)
+        db.session.commit()
+
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
 
 admin_bp = Blueprint('admin', __name__, template_folder='templates')
 

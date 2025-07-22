@@ -320,8 +320,18 @@ def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0, tipo_vino=Non
     print(f"📊 Vinos encontrados inicialmente: {len(vinos_filtrados)}")
     
     if len(vinos_filtrados) == 0:
-        print("❌ No se encontraron vinos con los criterios especificados")
-        return []
+        print("❌ No se encontraron vinos con los criterios especificados. Se mostrarán los mejores vinos del dataset.")
+        # Seleccionar los mejores 6 vinos del dataset completo (sin filtro)
+        df_top = df_original.sort_values(['rating', 'precio_eur'], ascending=[False, True]).head(6)
+        # Limpiar nombres y años para consistencia
+        if 'nombre_completo' in df_top.columns:
+            df_top['nombre_limpio'] = df_top['nombre_completo'].apply(limpiar_nombre_vino)
+        elif 'nombre_vino' in df_top.columns:
+            df_top['nombre_limpio'] = df_top['nombre_vino'].apply(limpiar_nombre_vino)
+        else:
+            df_top['nombre_limpio'] = "Vino seleccionado"
+        df_top['año'] = df_top['año'].apply(limpiar_año)
+        return df_top.to_dict('records')
     
 # Limpiar y convertir rating
 def limpiar_rating(rating_str):
@@ -763,7 +773,7 @@ def sommelier():
         try:
             # Verificar que el modelo esté cargado
             if model is None or scaler is None:
-                return render_template('sommelier_index.html',
+                return render_template('sommelier_index2.html',
                                     prediction_text='Error: Modelo Sommelier no disponible.',
                                     show_result=True,
                                     error=True)
@@ -815,7 +825,7 @@ def sommelier():
             }
             ocasion_text = ocasion_messages.get(ocasion, ocasion_messages['general'])
             
-            return render_template('sommelier_index.html',
+            return render_template('sommelier_index2.html',
                                 prediction_text=prediction_text,
                                 quality_category=prediccion,
                                 category_color=category_color,
@@ -826,18 +836,18 @@ def sommelier():
                                 error=False)
 
         except ValueError as e:
-            return render_template('sommelier_index.html',
+            return render_template('sommelier_index2.html',
                                 prediction_text='Error: Por favor, ingrese valores numéricos válidos.',
                                 show_result=True,
                                 error=True)
         except Exception as e:
-            return render_template('sommelier_index.html',
+            return render_template('sommelier_index2.html',
                                 prediction_text=f'Error inesperado: {str(e)}',
                                 show_result=True,
                                 error=True)
 
     # GET request - mostrar formulario inicial
-    return render_template('sommelier_index.html', show_result=False)
+    return render_template('sommelier_index2.html', show_result=False)
 
 @app.route('/api/vinos')
 def api_vinos():
