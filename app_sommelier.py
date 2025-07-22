@@ -354,94 +354,83 @@ def limpiar_año(año_val):
         return int(float(año_val))
     except:
         return "N/A"
-    
-    vinos_filtrados['año'] = vinos_filtrados['año'].apply(limpiar_año)
-    
-    # Limpiar y simplificar nombres de vinos
-    def limpiar_nombre_vino(nombre):
-        try:
-            if pd.isna(nombre):
-                return "Vino sin nombre"
-            
-            nombre_str = str(nombre)
-            
-            # Remover información extra común
-            import re
-            
-            # Eliminar números de añadas y calificaciones
-            nombre_str = re.sub(r'\b20\d{2}\b', '', nombre_str)
-            
-            # Eliminar precios, puntuaciones y símbolos
-            nombre_str = re.sub(r'[\€\$]\s*\d+[,\.]?\d*', '', nombre_str)  # Precios
-            nombre_str = re.sub(r'\d+[,\.]\d+\s*(puntos?|pts?)', '', nombre_str)  # Puntuaciones
-            nombre_str = re.sub(r'\d+\s*ml\b', '', nombre_str)  # Volúmenes
-            nombre_str = re.sub(r'\b\d+\s*cl\b', '', nombre_str)  # Centilitros
-            
-            # Eliminar información de descuentos y ofertas
-            nombre_str = re.sub(r'\d+%\s*(descuento|off)', '', nombre_str, flags=re.IGNORECASE)
-            nombre_str = re.sub(r'ahorra\d+%?', '', nombre_str, flags=re.IGNORECASE)
-            
-            # Eliminar regiones específicas del nombre (ya se muestran por separado)
-            regiones = ['Campo de Borja', 'Calatayud', 'Almansa', 'Ribera del Duero', 
-                       'Rioja', 'Rías Baixas', 'Toro', 'Bierzo', 'Jumilla', 'Montsant',
-                       'Priorat', 'Penedès', 'Catalunya', 'Valencia', 'Alicante', 'Mallorca']
-            
-            for region in regiones:
-                nombre_str = re.sub(re.escape(region), '', nombre_str, flags=re.IGNORECASE)
-            
-            # Limpiar caracteres especiales y espacios múltiples
-            nombre_str = re.sub(r'[^\w\s\-\.]', ' ', nombre_str)
-            nombre_str = re.sub(r'\s+', ' ', nombre_str)
-            
-            # Dividir por palabras clave que separan el nombre de la bodega
-            separadores = ['Campo', 'Bodega', 'Bodegas', 'Winery', 'Estate', 'Viñedos', 'Cellers']
-            for sep in separadores:
-                if sep in nombre_str:
-                    partes = nombre_str.split(sep)
-                    if len(partes) > 1 and len(partes[0].strip()) > 3:
-                        nombre_str = partes[0].strip()
-                        break
-            
-            # Si contiene comas, tomar solo la primera parte (nombre principal)
-            if ',' in nombre_str:
-                nombre_str = nombre_str.split(',')[0]
-            
-            # Limpiar espacios al inicio y final
-            nombre_str = nombre_str.strip()
-            
-            # Eliminar palabras repetidas o muy cortas al final
-            palabras = nombre_str.split()
-            palabras_filtradas = []
-            
-            for palabra in palabras:
-                # Mantener palabras significativas
-                if len(palabra) >= 3 and palabra.lower() not in ['del', 'de', 'la', 'el', 'los', 'las']:
-                    # Evitar repetir la misma palabra
-                    if not palabras_filtradas or palabra.lower() != palabras_filtradas[-1].lower():
-                        palabras_filtradas.append(palabra)
-            
-            nombre_str = ' '.join(palabras_filtradas)
-            
-            # Si el nombre está vacío después de la limpieza, usar un fallback
-            if not nombre_str or len(nombre_str) < 3:
-                return "Vino seleccionado"
-            
-            # Limitar longitud para mantener la interfaz limpia
-            if len(nombre_str) > 50:
-                nombre_str = nombre_str[:50] + "..."
-            
-            return nombre_str
-            
-        except:
+
+def limpiar_nombre_vino(nombre):
+    try:
+        if pd.isna(nombre):
+            return "Vino sin nombre"
+        
+        nombre_str = str(nombre)
+        
+        # Remover información extra común
+        import re
+        
+        # Eliminar números de añadas y calificaciones
+        nombre_str = re.sub(r'\b20\d{2}\b', '', nombre_str)
+        
+        # Eliminar precios, puntuaciones y símbolos
+        nombre_str = re.sub(r'[\€\$]\s*\d+[,\.]?\d*', '', nombre_str)  # Precios
+        nombre_str = re.sub(r'\d+[,\.]\d+\s*(puntos?|pts?)', '', nombre_str)  # Puntuaciones
+        nombre_str = re.sub(r'\d+\s*ml\b', '', nombre_str)  # Volúmenes
+        nombre_str = re.sub(r'\b\d+\s*cl\b', '', nombre_str)  # Centilitros
+        
+        # Eliminar información de descuentos y ofertas
+        nombre_str = re.sub(r'\d+%\s*(descuento|off)', '', nombre_str, flags=re.IGNORECASE)
+        nombre_str = re.sub(r'ahorra\d+%?', '', nombre_str, flags=re.IGNORECASE)
+        
+        # Eliminar regiones específicas del nombre (ya se muestran por separado)
+        regiones = ['Campo de Borja', 'Calatayud', 'Almansa', 'Ribera del Duero', 
+                   'Rioja', 'Rías Baixas', 'Toro', 'Bierzo', 'Jumilla', 'Montsant',
+                   'Priorat', 'Penedès', 'Catalunya', 'Valencia', 'Alicante', 'Mallorca']
+        
+        for region in regiones:
+            nombre_str = re.sub(re.escape(region), '', nombre_str, flags=re.IGNORECASE)
+        
+        # Limpiar caracteres especiales y espacios múltiples
+        nombre_str = re.sub(r'[^\w\s\-\.]', ' ', nombre_str)
+        nombre_str = re.sub(r'\s+', ' ', nombre_str)
+        
+        # Dividir por palabras clave que separan el nombre de la bodega
+        separadores = ['Campo', 'Bodega', 'Bodegas', 'Winery', 'Estate', 'Viñedos', 'Cellers']
+        for sep in separadores:
+            if sep in nombre_str:
+                partes = nombre_str.split(sep)
+                if len(partes) > 1 and len(partes[0].strip()) > 3:
+                    nombre_str = partes[0].strip()
+                    break
+        
+        # Si contiene comas, tomar solo la primera parte (nombre principal)
+        if ',' in nombre_str:
+            nombre_str = nombre_str.split(',')[0]
+        
+        # Limpiar espacios al inicio y final
+        nombre_str = nombre_str.strip()
+        
+        # Eliminar palabras repetidas o muy cortas al final
+        palabras = nombre_str.split()
+        palabras_filtradas = []
+        
+        for palabra in palabras:
+            # Mantener palabras significativas
+            if len(palabra) >= 3 and palabra.lower() not in ['del', 'de', 'la', 'el', 'los', 'las']:
+                # Evitar repetir la misma palabra
+                if not palabras_filtradas or palabra.lower() != palabras_filtradas[-1].lower():
+                    palabras_filtradas.append(palabra)
+        
+        nombre_str = ' '.join(palabras_filtradas)
+        
+        # Si el nombre está vacío después de la limpieza, usar un fallback
+        if not nombre_str or len(nombre_str) < 3:
             return "Vino seleccionado"
-    
-    # Aplicar limpieza de nombres
-    if 'nombre_completo' in vinos_filtrados.columns:
-        vinos_filtrados['nombre_limpio'] = vinos_filtrados['nombre_completo'].apply(limpiar_nombre_vino)
-    elif 'nombre_vino' in vinos_filtrados.columns:
-        vinos_filtrados['nombre_limpio'] = vinos_filtrados['nombre_vino'].apply(limpiar_nombre_vino)
-    else:
-        vinos_filtrados['nombre_limpio'] = "Vino seleccionado"
+        
+        # Limitar longitud para mantener la interfaz limpia
+        if len(nombre_str) > 50:
+            nombre_str = nombre_str[:50] + "..."
+        
+        return nombre_str
+        
+    except:
+        return "Vino seleccionado"
     
     # SISTEMA DE DEDUPLICACIÓN SUPER ESTRICTO PARA ELIMINAR DUPLICADOS EXACTOS
     def crear_clave_unica_robusta(row):
