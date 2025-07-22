@@ -433,134 +433,10 @@ def limpiar_nombre_vino(nombre):
         return "Vino seleccionado"
     
     # SISTEMA DE DEDUPLICACIÓN SUPER ESTRICTO PARA ELIMINAR DUPLICADOS EXACTOS
-    def crear_clave_unica_robusta(row):
-        """Crear clave única robusta que detecte duplicados exactos"""
-        try:
-            # Componentes principales para identificar vinos únicos
-            bodega = str(row.get('bodega', '')).lower().strip()
-            año = str(row.get('año', ''))
-            precio = str(row.get('precio_eur', ''))
-            
-            # Normalizar bodega removiendo caracteres especiales
-            import re
-            bodega_clean = re.sub(r'[^\w]', '', bodega)
-            
-            # Crear clave con bodega + año + precio (detecta duplicados exactos)
-            clave = f"{bodega_clean}_{año}_{precio}"
-            
-            return clave.lower()
-        except:
-            return f"vino_unico_{row.name}_{id(row)}"
-    
-    # Aplicar deduplicación SUPER estricta para eliminar duplicados exactos
-    print("🧹 Aplicando deduplicación SUPER ESTRICTA para eliminar duplicados exactos...")
-    vinos_filtrados['clave_duplicados_exactos'] = vinos_filtrados.apply(crear_clave_unica_robusta, axis=1)
-    
-    # Ordenar por calidad antes de eliminar duplicados
-    vinos_filtrados = vinos_filtrados.sort_values(
-        ['rating_limpio', 'precio_eur'], 
-        ascending=[False, True]
-    )
-    
-    # PASO 1: Eliminar duplicados exactos (misma bodega, año, precio)
-    vinos_sin_duplicados_exactos = vinos_filtrados.drop_duplicates(
-        subset=['clave_duplicados_exactos'], 
-        keep='first'
-    ).reset_index(drop=True)
-    
-    print(f"✅ Después de eliminar duplicados exactos: {len(vinos_sin_duplicados_exactos)} vinos")
-    
-    # PASO 2: Aplicar deduplicación por nombre + bodega para diversidad
-    def crear_clave_diversidad(row):
-        """Crear clave para asegurar diversidad de vinos"""
-        try:
-            nombre = str(row.get('nombre_limpio', '')).lower().strip()
-            bodega = str(row.get('bodega', '')).lower().strip()
-            
-            import re
-            # Limpiar nombres para comparación
-            nombre_clean = re.sub(r'[^\w]', '', nombre)
-            bodega_clean = re.sub(r'[^\w]', '', bodega)
-            
-            # Crear clave de diversidad
-            clave = f"{nombre_clean}_{bodega_clean}"
-            
-            return clave.lower()
-        except:
-            return f"diversidad_{row.name}"
-    
-    vinos_sin_duplicados_exactos['clave_diversidad'] = vinos_sin_duplicados_exactos.apply(crear_clave_diversidad, axis=1)
-    
-    # Eliminar vinos muy similares para asegurar diversidad
-    vinos_diversos = vinos_sin_duplicados_exactos.drop_duplicates(
-        subset=['clave_diversidad'], 
-        keep='first'
-    ).reset_index(drop=True)
-    
-    print(f"✅ Después de asegurar diversidad: {len(vinos_diversos)} vinos únicos")
-    
-    # PASO 3: Si aún no tenemos suficientes, usar estrategia de diversificación forzada
-    if len(vinos_diversos) < 6:
-        print(f"⚠️ Solo {len(vinos_diversos)} vinos diversos, aplicando diversificación forzada...")
-        
-        # Diversificar por bodega
-        vinos_por_bodega = vinos_sin_duplicados_exactos.drop_duplicates(
-            subset=['bodega'], 
-            keep='first'
-        )
-        
-        if len(vinos_por_bodega) >= 6:
-            vinos_diversos = vinos_por_bodega.head(6)
-            print(f"✅ Diversificación por bodega: {len(vinos_diversos)} vinos únicos")
-        else:
-            # Si no hay suficientes bodegas, usar lo que tenemos
-            vinos_diversos = vinos_sin_duplicados_exactos.head(6)
-            print(f"✅ Usando los mejores disponibles: {len(vinos_diversos)} vinos")
-    
-    # Seleccionar exactamente 6 vinos
-    vinos_finales = vinos_diversos.head(6).copy()
-    
-    # VERIFICACIÓN FINAL EXHAUSTIVA
-    print(f"🔍 VERIFICACIÓN FINAL EXHAUSTIVA:")
-    
-    # Verificar duplicados por bodega + año + precio
-    verificacion_exactos = []
-    for _, vino in vinos_finales.iterrows():
-        clave_exacta = f"{vino['bodega']}_{vino['año']}_{vino['precio_eur']}"
-        verificacion_exactos.append(clave_exacta)
-    
-    duplicados_exactos = len(verificacion_exactos) - len(set(verificacion_exactos))
-    
-    print(f"   � Vinos seleccionados: {len(vinos_finales)}")
-    print(f"   🔄 Duplicados exactos detectados: {duplicados_exactos}")
-    
-    # Si hay duplicados exactos, aplicar filtro final
-    if duplicados_exactos > 0:
-        print("⚠️ DUPLICADOS EXACTOS DETECTADOS - Aplicando filtro final")
-        
-        vinos_finales_unicos = []
-        claves_usadas = set()
-        
-        for _, vino in vinos_sin_duplicados_exactos.iterrows():
-            clave_exacta = f"{vino['bodega']}_{vino['año']}_{vino['precio_eur']}"
-            if clave_exacta not in claves_usadas and len(vinos_finales_unicos) < 6:
-                claves_usadas.add(clave_exacta)
-                vinos_finales_unicos.append(vino.to_dict())
-        
-        print(f"✅ Filtro final aplicado: {len(vinos_finales_unicos)} vinos únicos garantizados")
-        return vinos_finales_unicos
-    
-    # Mostrar los vinos seleccionados para debugging
-    print("🍷 VINOS SELECCIONADOS:")
-    for i, vino in enumerate(vinos_finales.iterrows(), 1):
-        nombre = vino[1]['nombre_limpio']
-        bodega = vino[1]['bodega']
-        año = vino[1]['año']
-        rating = vino[1]['rating_limpio']
-        precio = vino[1]['precio_eur']
-        print(f"   {i}. {nombre} - {bodega} ({año}) - ⭐{rating:.2f} - €{precio:.2f}")
-    # Siempre devolver la lista de vinos recomendados
-    return vinos_finales.to_dict('records')
+def crear_clave_unica_robusta(row):
+    """Crear clave única robusta que detecte duplicados exactos"""
+    # ...implementación pendiente...
+
 
 def validate_registration_data(data):
     """Valida los datos de registro"""
@@ -814,14 +690,7 @@ def sommelier():
             }
             ocasion_text = ocasion_messages.get(ocasion, ocasion_messages['general'])
 
-            # LOG para depuración de vinos recomendados
-            print("\n===== DEBUG vinos_recomendados =====")
-            if vinos_recomendados:
-                for i, vino in enumerate(vinos_recomendados, 1):
-                    print(f"{i}. {vino}")
-            else:
-                print("(Vacío o None)")
-            print("===== FIN DEBUG vinos_recomendados =====\n")
+
 
             return render_template('sommelier_index2.html',
                                 prediction_text=prediction_text,
