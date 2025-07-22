@@ -140,6 +140,27 @@
                 </div>
               </div>
 
+              <!-- Tipo de Vino -->
+              <div class="col-md-6 mb-3">
+                <div class="parameter-card">
+                  <label for="tipo_vino" class="form-label">
+                    <i class="fas fa-wine-bottle"></i> Tipo de vino
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">🍷</span>
+                    <select
+                      class="form-control"
+                      id="tipo_vino"
+                      name="tipo_vino"
+                    >
+                      <option value="ambos" selected>Ambos</option>
+                      <option value="tinto">Tinto</option>
+                      <option value="blanco">Blanco</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <!-- Rating Mínimo -->
               <div class="col-md-6 mb-3">
                 <div class="parameter-card">
@@ -294,7 +315,7 @@
                     </span>
                     <small class="text-light">
                       <i class="fas fa-comments"></i>
-                      {{ vino.num_reviews }} reviews
+                      {{ vino.num_reviews|int }} reviews
                     </small>
                   </div>
 

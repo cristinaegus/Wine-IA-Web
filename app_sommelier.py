@@ -559,7 +559,7 @@ def limpiar_nombre_vino(nombre):
         rating = vino[1]['rating_limpio']
         precio = vino[1]['precio_eur']
         print(f"   {i}. {nombre} - {bodega} ({año}) - ⭐{rating:.2f} - €{precio:.2f}")
-    
+    # Siempre devolver la lista de vinos recomendados
     return vinos_finales.to_dict('records')
 
 def validate_registration_data(data):
@@ -793,7 +793,7 @@ def sommelier():
             
             # Preparar contexto de respuesta
             prediction_text = f"Recomendación: {prediccion}"
-            
+
             # Determinar color según predicción
             color_map = {
                 'Excelente': 'text-success',
@@ -803,7 +803,7 @@ def sommelier():
                 'Básico': 'text-secondary'
             }
             category_color = color_map.get(prediccion, 'text-primary')
-            
+
             # Mensaje personalizado según ocasión
             ocasion_messages = {
                 'romantica': 'Perfecto para una velada romántica',
@@ -813,7 +813,16 @@ def sommelier():
                 'general': 'Excelente elección para cualquier ocasión'
             }
             ocasion_text = ocasion_messages.get(ocasion, ocasion_messages['general'])
-            
+
+            # LOG para depuración de vinos recomendados
+            print("\n===== DEBUG vinos_recomendados =====")
+            if vinos_recomendados:
+                for i, vino in enumerate(vinos_recomendados, 1):
+                    print(f"{i}. {vino}")
+            else:
+                print("(Vacío o None)")
+            print("===== FIN DEBUG vinos_recomendados =====\n")
+
             return render_template('sommelier_index2.html',
                                 prediction_text=prediction_text,
                                 quality_category=prediccion,
