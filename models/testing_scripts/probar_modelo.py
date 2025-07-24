@@ -15,9 +15,9 @@ def probar_modelo():
     
     try:
         # Cargar modelo y componentes
-        modelo = joblib.load('static/wine_model.pkl')
-        scaler = joblib.load('static/wine_scaler.pkl')
-        info_modelo = joblib.load('static/model_info.pkl')
+        modelo = joblib.load('c:/Users/egusq/C2BCurso/Wine_ModeloPred_IA/Wine-IA-Web/modelos generados/modelo_random_forest_vivino.pkl')
+        scaler = joblib.load('c:/Users/egusq/C2BCurso/Wine_ModeloPred_IA/Wine-IA-Web/modelos generados/scaler_vivino.pkl')
+        info_modelo = {'clases_calidad': ['Excelente', 'Muy Bueno', 'Bueno', 'Regular', 'Básico'], 'caracteristicas': ['precio_eur', 'region_encoded', 'año', 'rating', 'num_reviews']}
         
         print("✅ Modelo cargado exitosamente")
         print(f"📊 Características: {len(info_modelo['caracteristicas'])}")

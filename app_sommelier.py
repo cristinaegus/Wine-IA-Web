@@ -661,8 +661,23 @@ def sommelier():
             elif gusto == 'equilibrado':
                 rating_objetivo = max(4.12, rating_min)
             
-            # Predecir calidad
-            prediccion, confianza = predecir_calidad_vino_completo(precio_promedio, rating_objetivo, 2021)
+            # --- Integración directa del modelo generado ---
+            import joblib
+
+            modelo_path = os.path.join('modelos generados', 'modelo_random_forest_vivino.pkl')
+            scaler_path = os.path.join('modelos generados', 'scaler_vivino.pkl')
+            modelo_cargado = joblib.load(modelo_path)
+            clf_loaded = modelo_cargado['model']
+            le_target_loaded = modelo_cargado['le_target']
+            scaler_loaded = joblib.load(scaler_path)
+            # Preparar datos para predicción (solo precio, rating, num_reviews)
+            num_reviews = int(request.form.get('num_reviews', 500))
+            X_pred = np.array([[precio_promedio, rating_objetivo, num_reviews]])
+            X_pred_scaled = scaler_loaded.transform(X_pred)
+            pred = clf_loaded.predict(X_pred_scaled)
+            pred_label = le_target_loaded.inverse_transform(pred)[0]
+            prediccion = pred_label
+            confianza = max(clf_loaded.predict_proba(X_pred_scaled)[0]) * 100 if hasattr(clf_loaded, 'predict_proba') else 100.0
             
             # Buscar vinos similares
             vinos_recomendados = buscar_vinos_similares(precio_min, precio_max, rating_min, tipo_vino)
@@ -676,7 +691,10 @@ def sommelier():
                 'Muy Bueno': 'text-info', 
                 'Bueno': 'text-primary',
                 'Regular': 'text-warning',
-                'Básico': 'text-secondary'
+                'Básico': 'text-secondary',
+                'Great Value': 'text-success',
+                'Amazing Value': 'text-info',
+                'Good Value': 'text-primary'
             }
             category_color = color_map.get(prediccion, 'text-primary')
 

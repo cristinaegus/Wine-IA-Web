@@ -197,6 +197,7 @@
                 </div>
               </div>
 
+
               <!-- Rating Mínimo -->
               <div class="col-md-6 mb-3">
                 <div class="parameter-card">
@@ -215,6 +216,29 @@
                       <option value="4.15">4.15+ (Sobresaliente)</option>
                       <option value="4.2">4.2+ (Excepcional)</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Número de Reseñas -->
+              <div class="col-md-6 mb-3">
+                <div class="parameter-card">
+                  <label for="num_reviews" class="form-label">
+                    <i class="fas fa-users"></i> Número de Reseñas
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">#</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="num_reviews"
+                      name="num_reviews"
+                      placeholder="500"
+                      min="0"
+                      max="10000"
+                      value="500"
+                      required
+                    />
                   </div>
                 </div>
               </div>
