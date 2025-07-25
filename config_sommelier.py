@@ -86,7 +86,8 @@ class Config:
     MODELS_DIR = BASE_DIR / 'modelos generados'
     
     # Configuración Flask
-    SECRET_KEY = 'sommelier-wine-recommendation-2025'
+    import os
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'sommelier-wine-recommendation-2025')
     DEBUG = True
     HOST = '127.0.0.1'
     PORT = 5001
