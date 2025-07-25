@@ -1,0 +1,28 @@
+app = "wine-ia-web"
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+
+[env]
+PORT = "5001"
+
+[experimental]
+  auto_rollback = true
+
+[[services]]
+  internal_port = 5001
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = 10000
+    timeout = 2000
+    grace_period = "5s"
+    restart_limit = 0
