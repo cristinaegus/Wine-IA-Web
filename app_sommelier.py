@@ -320,18 +320,50 @@ def buscar_vinos_similares(precio_min, precio_max, rating_min=4.0, tipo_vino=Non
     print(f"📊 Vinos encontrados inicialmente: {len(vinos_filtrados)}")
     
     if len(vinos_filtrados) == 0:
-        print("❌ No se encontraron vinos con los criterios especificados. Se mostrarán los mejores vinos del dataset.")
-        # Seleccionar los mejores 6 vinos del dataset completo (sin filtro)
-        df_top = df_original.sort_values(['rating', 'precio_eur'], ascending=[False, True]).head(6)
-        # Limpiar nombres y años para consistencia
-        if 'nombre_completo' in df_top.columns:
-            df_top['nombre_limpio'] = df_top['nombre_completo'].apply(limpiar_nombre_vino)
-        elif 'nombre_vino' in df_top.columns:
-            df_top['nombre_limpio'] = df_top['nombre_vino'].apply(limpiar_nombre_vino)
+        print("❌ No se encontraron vinos con los criterios especificados. Se mostrarán vinos variados entre los mejores del dataset.")
+        # Seleccionar los 500 mejores vinos por rating y precio
+        df_top = df_original.sort_values(['rating', 'precio_eur'], ascending=[False, True]).head(500)
+        # Elegir 6 aleatorios entre los mejores 500
+        if len(df_top) >= 6:
+            df_top_sample = df_top.sample(n=6, random_state=np.random.randint(0, 10000))
         else:
-            df_top['nombre_limpio'] = "Vino seleccionado"
-        df_top['año'] = df_top['año'].apply(limpiar_año)
-        return df_top.to_dict('records')
+            # Si hay menos de 6, tomar todos y rellenar con otros vinos aleatorios del dataset
+            df_top_sample = df_top.copy()
+            faltan = 6 - len(df_top_sample)
+            if faltan > 0:
+                # Excluir los ya seleccionados
+                df_restantes = df_original.drop(df_top_sample.index)
+                if len(df_restantes) > 0:
+                    # Si solo hay una fila, sample devuelve una Serie, así que forzamos DataFrame
+                    df_extra = df_restantes.sample(n=min(faltan, len(df_restantes)), random_state=np.random.randint(0, 10000))
+                    if isinstance(df_extra, pd.Series):
+                        df_extra = df_extra.to_frame().T
+                    df_top_sample = pd.concat([df_top_sample, df_extra], ignore_index=True)
+            # Si aún faltan, rellenar con filas vacías (opcional, pero así siempre hay 6)
+            if len(df_top_sample) < 6:
+                for _ in range(6 - len(df_top_sample)):
+                    fila_vacia = {
+                        'nombre_completo': 'Vino seleccionado',
+                        'nombre_vino': 'Vino seleccionado',
+                        'precio_eur': 0,
+                        'año': 'N/A',
+                        'rating': 0,
+                        'tipo_vino': 'N/A'
+                    }
+                    df_top_sample = pd.concat([df_top_sample, pd.DataFrame([fila_vacia])], ignore_index=True)
+        # Limpiar nombres y años para consistencia SOLO si la columna existe y no es float/NaN
+        if 'nombre_completo' in df_top_sample.columns:
+            df_top_sample['nombre_limpio'] = df_top_sample['nombre_completo'].apply(lambda x: limpiar_nombre_vino(x) if not isinstance(x, float) or not pd.isna(x) else "Vino seleccionado")
+        elif 'nombre_vino' in df_top_sample.columns:
+            df_top_sample['nombre_limpio'] = df_top_sample['nombre_vino'].apply(lambda x: limpiar_nombre_vino(x) if not isinstance(x, float) or not pd.isna(x) else "Vino seleccionado")
+        else:
+            df_top_sample['nombre_limpio'] = "Vino seleccionado"
+        if 'año' in df_top_sample.columns:
+            df_top_sample['año'] = df_top_sample['año'].apply(lambda x: limpiar_año(x) if not isinstance(x, float) or not pd.isna(x) else "N/A")
+        # Ordenar por precio ascendente antes de renderizar
+        if 'precio_eur' in df_top_sample.columns:
+            df_top_sample = df_top_sample.sort_values('precio_eur', ascending=True, ignore_index=True)
+        return df_top_sample.to_dict('records')
     
 # Limpiar y convertir rating
 def limpiar_rating(rating_str):

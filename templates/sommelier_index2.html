@@ -18,6 +18,13 @@
     />
     <link rel="stylesheet" href="/static/style/home.css" />
     <style>
+      body {
+        background-image: url('{{ url_for('static', filename='images/pexels-david-paisajevinos.jpg') }}');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
       .wine-card {
         border: 2px solid #722f37;
         border-radius: 15px;
@@ -336,16 +343,7 @@
                   <div class="mb-2">
                     <h6 class="text-warning mb-1 wine-name">
                       <i class="fas fa-wine-glass"></i>
-                      {% if vino.nombre_completo %} {{
-                      vino.nombre_completo[:120] }}{% if
-                      vino.nombre_completo|length > 120 %}...{% endif %} {% elif
-                      vino.nombre_vino %} {% set wine_name =
-                      vino.nombre_vino.split(',')[0] if ',' in vino.nombre_vino
-                      else vino.nombre_vino %} {% set clean_name =
-                      wine_name.split('4,')[0] if '4,' in wine_name else
-                      wine_name %} {{ clean_name[:120] }}{% if clean_name|length
-                      > 120 %}...{% endif %} {% else %} Vino de {{ vino.bodega
-                      }} {% endif %}
+                      {{ vino.nombre_limpio }}{% if vino.año %} ({{ vino.año }}){% endif %}{% if vino.bodega %} - {{ vino.bodega }}{% endif %}
                     </h6>
                     <div
                       class="d-flex justify-content-between align-items-center"
