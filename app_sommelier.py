@@ -81,7 +81,9 @@ def categorizar_precio(precio):
 # Endpoint Chatbot (para compatibilidad con frontend antiguo)
 @app.route('/api/chatbot', methods=['POST'])
 def chatbot():
-    return chatbot_endpoint(chat)
+    # La función chatbot_endpoint ya no necesita argumentos
+    # porque usa la variable global 'chat' de chatbot.py
+    return chatbot_endpoint()
 
 def predecir_calidad_vino_completo(precio, rating, año, bodega="Desconocida", region="España", num_reviews=500):
     """Predice la categoría de calidad usando el modelo completo con 15 características"""

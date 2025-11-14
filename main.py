@@ -11,8 +11,20 @@ except ImportError:
     pass
 
 def load_model():
-    from langchain.chat_models import init_chat_model
-    return init_chat_model("llama3-8b-8192", model_provider="groq")
+    """Carga el modelo actualizado de Groq"""
+    from langchain_groq import ChatGroq
+    import os
+    
+    api_key = os.environ.get("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise ValueError("GROQ_API_KEY no configurada")
+    
+    # Usar modelo actualizado y soportado
+    return ChatGroq(
+        api_key=api_key,
+        model_name="llama-3.3-70b-versatile",  # Modelo actualizado
+        temperature=0.7
+    )
 
 model = load_model()
 
